@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cecs327termproject;
 
 import java.io.File;
@@ -21,11 +16,17 @@ import java.util.Date;
 */
 public class FileData {
     
+    /** Instance of this file. */
     private File file; 
+    /** File path as path object. */
     private Path path;
+    /** File name as string. */
     private String name;
+    /** File size as long. */
     private long size;
+    /** Last modified date. */
     private Date date;
+    /** ArrayList of file block packets. */
     private ArrayList<FileBlock> blocks;
     
     /**

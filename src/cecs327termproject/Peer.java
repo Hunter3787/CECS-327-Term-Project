@@ -1,8 +1,5 @@
 package cecs327termproject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
 *  Peer class.
 *  CECS 327 Term Project.
@@ -13,10 +10,15 @@ public class Peer extends Thread{
     private static final int DEFAULT_PORT = 10100;
     private String ip;
     private int port = DEFAULT_PORT;
-    private HashMap<Peer,ArrayList<FileData>> peers;
     
-    public Peer(){
-        
+    public Peer(String ip){
+        this.ip = ip;
+        port = DEFAULT_PORT;
+    }
+    
+    public Peer(String ip, int port){
+        this.ip = ip;
+        this.port = port;
     }
     
     public String getIP(){ 
@@ -35,4 +37,7 @@ public class Peer extends Thread{
         this.port = port;
     }
     
+    public String toString(){
+        return "IP: " + ip + " Port: " + port;
+    }
 }
