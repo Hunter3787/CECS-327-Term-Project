@@ -36,13 +36,14 @@ public class FileData {
      * @throws IOException If file does not exist or is 
      * not present throw exception.
      */
-    public FileData(String path, String name) throws IOException{
-        this.path = Paths.get(path + name);       
-        this.file = new File(path + name);
+    public FileData(File file, String name) throws IOException{
+        this.path = Paths.get(file.getAbsolutePath());       
+        this.file = file;
         this.name = name;
         this.date = new Date(file.lastModified());
-        this.size = Files.size(this.path);
+        this.size = Files.size(path);
     }
+    
     /**
      * Returns an instance of the designated File.
      * @return Type File.
