@@ -20,6 +20,8 @@ public class Peer implements Runnable{
     private String ip;
     /** Peer port value as integer. */
     private int port;
+
+    
     /** Local ArrayList of Files to sync in the run method. */
     private ArrayList<FileData> toSync;
     
@@ -67,7 +69,19 @@ public class Peer implements Runnable{
      */
     @Override
     public void run(){
+        
+        
+        
+        
         //TODO: Perform the download 
+        
+        
+        
+        
+        
+        
+        
+        
         toSync.clear();
     }
     
@@ -76,7 +90,7 @@ public class Peer implements Runnable{
      * from this particular peer, then runs the thread as normal. 
      * @param toSync 
      */
-    public void syncPeer(ArrayList<FileData> toSync){
+    public void syncWithPeer(ArrayList<FileData> toSync){
         this.toSync = toSync;
         Peer temp = this;
         Thread t = new Thread(temp);

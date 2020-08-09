@@ -2,7 +2,9 @@ package cecs327termproject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +27,13 @@ public class Main implements Runnable{
     public static final int DEFAULT_PORT = 10100;
     /** Local static directory for MacBook. */
     public static final String DEFAULT_DIRECTORY 
-            = "/Users/nickolausmarshall-eminger/Documents/CSULB/CECS 327";
+            = "/Users/nickolausmarshall-eminger/Documents/CSULB/CECS 327/TestFolder";
         
+    /** Local static directory for Desktop. *
+    public static final String DEFAULT_DIRECTORY
+            = "C:\\Users\\Snake\\Documents\\TermProjectTest";
+    */
+    
     /**
      * Main method.
      * @param args 
@@ -37,7 +44,6 @@ public class Main implements Runnable{
         Main main = new Main();
         Thread mainLogicThread = new Thread(main);
         mainLogicThread.start();
-        
         
         //Scanner that waits for the user to type exit to end the program 
         //and all threads.
@@ -62,6 +68,10 @@ public class Main implements Runnable{
         ServerHandler server = new ServerHandler();
         Thread serverThread = new Thread(server); 
         serverThread.start();
+        //SetupBroadcastReceiver "server"
+        BroadcastReceiver br = new BroadcastReceiver();
+        Thread receiver = new Thread(br);
+        receiver.start();
         
         //Create instance of Broadcaster.
         Broadcaster call = Broadcaster.getInstance();
@@ -76,16 +86,18 @@ public class Main implements Runnable{
         
         //While loop to perform until the user exits.
         while(loop){ 
-            
-            //Send UDP query for local data including IP and available peers.
+                        
+            //Send broadcast to inform network this system is active.
             call.broadcast();
+            //Place received broadcast addresses into an arryalist.
+            ArrayList<InetAddress> addressList = br.getAddresses();
             
             //Build an array of files from the default directory of files.
             File[] fileArray = new File(DEFAULT_DIRECTORY).listFiles();
             //ArrayList of custom type FileData carrying all local files
             //and the information needed to compare to the networks files.
             ArrayList<FileData> localData = new ArrayList<>();
-            
+
             //An ArrayList of active peers on the server.
             ArrayList<Peer> peers = server.getPeers();
             //Map of collected peers and peerData on each loop.
@@ -97,9 +109,22 @@ public class Main implements Runnable{
             for(File read : fileArray)  
                 try { localData.add(new FileData(read, read.getName())); } 
                 catch (IOException ex) { System.out.println("File not found.");}
-
             
-            //TODO: Send connected users the local data array for comparison.
+            
+            //TODO: Send TCP request to all local devices.
+            
+            //TODO: Populate map with peer data.
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             // A very rough compare method that checks each files existence
             // in the localData array, along with comparing the modified date, and
@@ -133,7 +158,7 @@ public class Main implements Runnable{
             //peer syncs. 
             for(Map.Entry<String,ArrayList<FileData>> map : toDownload.entrySet()){
                 Peer tempPeer = peers.get(peers.indexOf(map.getKey()));
-                tempPeer.syncPeer(map.getValue());
+                tempPeer.syncWithPeer(map.getValue());
             }
             
             /**
@@ -149,10 +174,14 @@ public class Main implements Runnable{
             for(Peer out : peers)
                 System.out.println(out.toString());
             
+            for(InetAddress out : addressList)
+                System.out.println(out.toString());
+            
             
             /**
              * -----REMOVE ABOVE ----
              */
+            
             try {
                 Thread.sleep(30 * 1000);    //Main mainLogicThread sleeps 
                                             //for half a minute after each loop.
@@ -161,7 +190,8 @@ public class Main implements Runnable{
             }
         }//End while
         
-        //TODO: Cleanup.
+        //Cleanup
+        br.stopReceiver();
         server.closeServer();
         serverThread.interrupt();        
     }

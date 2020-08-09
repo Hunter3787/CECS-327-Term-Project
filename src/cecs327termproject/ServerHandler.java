@@ -39,7 +39,9 @@ public class ServerHandler implements Runnable{
         
         //Try catch to assign a server socket to the listener.
         try { listener = new ServerSocket(Main.DEFAULT_PORT); } 
-        catch (IOException ex) { System.out.println("ServerSocket Failure."); }
+        catch (IOException ex) { 
+            System.out.println("ServerSocket Failure."); 
+        }
         
         //Infinite loop that will try to assign a new client peer to the peers
         //ArrayList and execute another thread for that peer. 

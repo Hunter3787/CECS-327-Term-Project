@@ -1,10 +1,13 @@
 package cecs327termproject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +21,7 @@ import java.util.logging.Logger;
 *  Date: July 31, 2020
 */
 public class Broadcaster{
-    private static Broadcaster discoveryInstance = null;
+    private static Broadcaster broadcasterInstance = null;
     private DatagramSocket socket;
     
     public Broadcaster(){ 
@@ -26,13 +29,16 @@ public class Broadcaster{
     
     /**
      * Singleton instance call. 
+     * Not really necessary, but thought I'd try it out.
      * @return 
      */
     public static Broadcaster getInstance(){
-        if(discoveryInstance == null)
-            discoveryInstance = new Broadcaster();
+        //If instance of Broadcaster doesn't exist, createa a new one.
+        if(broadcasterInstance == null)
+            broadcasterInstance = new Broadcaster();
         
-        return discoveryInstance;
+        //Return broadcasterInstance.
+        return broadcasterInstance;
     }
     
     public void broadcast(){
@@ -40,18 +46,20 @@ public class Broadcaster{
             socket = new DatagramSocket();
             socket.setBroadcast(true);
 
-            //Packet receiver setup.
-            byte[] buffer = new byte[16384];
-            DatagramPacket outgoingPacket = new DatagramPacket(buffer, buffer.length);
+            //Create packet and pass local IP to other machines.
+            byte[] buffer = InetAddress.getLocalHost().getAddress();
+            DatagramPacket outgoingPacket 
+                    = new DatagramPacket(buffer, buffer.length, 
+                            InetAddress.getByName("255.255.255.255"), 
+                            Main.DEFAULT_PORT);
             socket.send(outgoingPacket);
 
-            
-
-            
         } catch (SocketException ex) {
             System.out.println("Broadcast: Socket Exception.");
         } catch (IOException ex) {
             System.out.println("Broadcast: IOException.");
-        }  
+        } finally {
+            socket.close();
+        }
     }
 }

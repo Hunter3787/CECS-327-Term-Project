@@ -2,6 +2,7 @@ package cecs327termproject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +15,7 @@ import java.util.Date;
 *  @author Nickolaus Marshall-Eminger
 *  Date: July 31, 2020
 */
-public class FileData {
+public class FileData implements Serializable{
     
     /** Instance of this file. */
     private File file; 
