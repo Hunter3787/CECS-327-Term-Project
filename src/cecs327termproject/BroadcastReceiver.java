@@ -25,7 +25,7 @@ public class BroadcastReceiver implements Runnable {
     /** Boolean to end the while loop in the run. */
     private boolean running;
     /** A buffer of excessive size to carry IP and maybe other information. */
-    private byte[] buffer = new byte[16384];
+    private byte[] buffer = new byte[32];
     /** ArrayList of all found InetAddresses. */
     private ArrayList<InetAddress> addresses;
     
@@ -61,6 +61,8 @@ public class BroadcastReceiver implements Runnable {
                 socket.receive(packet);
                 //Collects the InetAdress from the packet.
                 InetAddress address = packet.getAddress();
+                //Test line to verify incoming packet.
+                System.out.println("InetAddress Received" + address);
                 //If found address is not part of the collected addresses
                 //Add it to the list.
                 if(!addresses.contains(address))

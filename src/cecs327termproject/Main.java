@@ -28,11 +28,10 @@ public class Main implements Runnable{
     /** Local static directory for MacBook. */
     public static final String DEFAULT_DIRECTORY 
             = "/Users/nickolausmarshall-eminger/Documents/CSULB/CECS 327/TestFolder";
-        
-    /** Local static directory for Desktop. *
-    public static final String DEFAULT_DIRECTORY
+    /** Local static directory for Desktop. */
+    public static final String UPLOAD_DIRECTORY
             = "C:\\Users\\Snake\\Documents\\TermProjectTest";
-    */
+    
     
     /**
      * Main method.
@@ -50,6 +49,7 @@ public class Main implements Runnable{
         Scanner in = new Scanner(System.in);
         while(!in.next().toLowerCase().equals("exit"));
         
+        in.close();
         main.loop = false;  //Stops the main while loop.
         mainLogicThread.interrupt(); //Should interupt the sleep and exit faster.
     }
@@ -64,14 +64,15 @@ public class Main implements Runnable{
      */
     @Override
     public void run() {
-        //Setup for server implimentation.
-        ServerHandler server = new ServerHandler();
-        Thread serverThread = new Thread(server); 
-        serverThread.start();
         //SetupBroadcastReceiver "server"
         BroadcastReceiver br = new BroadcastReceiver();
         Thread receiver = new Thread(br);
         receiver.start();
+        
+        //Setup for server implimentation.
+        ServerHandler server = new ServerHandler();
+        Thread serverThread = new Thread(server); 
+        serverThread.start();
         
         //Create instance of Broadcaster.
         Broadcaster call = Broadcaster.getInstance();
@@ -79,16 +80,35 @@ public class Main implements Runnable{
         //String of the local IP.
         String localIP = null;
         //Gather local IP through try.
-        try {
-            localIP = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException ex) { System.out.println("Unknown Host."); }
+        try { localIP = InetAddress.getLocalHost().getHostAddress(); }
+        catch (UnknownHostException ex) { System.out.println("Unknown Host."); }
         //These will not be moving so one time check is fine.
+        
+        //Send broadcast to inform network this system is active.
+        call.broadcast();
+        /*
+        After failed discovery and server attempts I've decided to just
+        hardcode the laptop and desktop together for file sync.
+        The above code was attempts at sending out a UDP to ping local computers
+        and return their IP, then to create set up a TCP connection to link the
+        two together, however the problem I couldn't think of a work around for
+        was to keep the sockets open yet refresh with new sockets every 30 seconds
+        for the new peers. 
+        Resulting in my final incarnation of leaving every thread running, to show
+        that it could, while creating a static link between A and B that will 
+        simply parse data, and refresh it on each computer every 30 seconds.
+        */
+        
+        Socket bruteForce = null;
+        try{ bruteForce = new Socket("192.168.1.28",DEFAULT_PORT); } 
+        catch (IOException ex) { System.out.println("Server not active yet."); }
         
         //While loop to perform until the user exits.
         while(loop){ 
                         
             //Send broadcast to inform network this system is active.
             call.broadcast();
+            
             //Place received broadcast addresses into an arryalist.
             ArrayList<InetAddress> addressList = br.getAddresses();
             
@@ -109,6 +129,12 @@ public class Main implements Runnable{
             for(File read : fileArray)  
                 try { localData.add(new FileData(read, read.getName())); } 
                 catch (IOException ex) { System.out.println("File not found.");}
+            
+            //Send file data from A to B. 
+            for(FileData send : localData){
+                
+            }
+            
             
             
             //TODO: Send TCP request to all local devices.
@@ -183,7 +209,7 @@ public class Main implements Runnable{
              */
             
             try {
-                Thread.sleep(30 * 1000);    //Main mainLogicThread sleeps 
+                Thread.sleep(5 * 1000);    //Main mainLogicThread sleeps 
                                             //for half a minute after each loop.
             } catch (InterruptedException ex) {
                 System.out.println("Sleep Interupted.");
@@ -191,6 +217,8 @@ public class Main implements Runnable{
         }//End while
         
         //Cleanup
+        try {bruteForce.close();} 
+        catch (IOException ex) { System.out.println("BruteForce does not exist."); }
         br.stopReceiver();
         server.closeServer();
         serverThread.interrupt();        
