@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 /**
 *  Main class.
+*  Synopsis of functionality on mid page. 
 *  CECS 327 Term Project.
 *  @author Nickolaus Marshall-Eminger
 *  Date: July 22, 2020
@@ -86,6 +87,7 @@ public class Main implements Runnable{
         
         //Send broadcast to inform network this system is active.
         call.broadcast();
+        
         /*
         After failed discovery and server attempts I've decided to just
         hardcode the laptop and desktop together for file sync.
@@ -97,6 +99,12 @@ public class Main implements Runnable{
         Resulting in my final incarnation of leaving every thread running, to show
         that it could, while creating a static link between A and B that will 
         simply parse data, and refresh it on each computer every 30 seconds.
+        
+        The bruteForce socket attaches to the other client, effectively making this
+        a client-server attachent, which I tried to avoid but could not figure out.
+        
+        Above is the attempts at a broadcast server, below is the broadcast call
+        neither of which seem to work.
         */
         
         Socket bruteForce = null;
